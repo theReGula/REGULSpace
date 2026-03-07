@@ -377,13 +377,17 @@
 
   /* Accordion body */
   .accordion-body {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    display: none;
   }
 
   .accordion-body.open {
-    max-height: 2000px;
+    display: block;
+    animation: accordionOpen 0.35s ease;
+  }
+
+  @keyframes accordionOpen {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
   .accordion-content {
@@ -422,8 +426,8 @@
     font-family: 'Bebas Neue', sans-serif;
     font-size: clamp(70px, 9vw, 120px);
     line-height: 0.88;
-    color: transparent;
-    -webkit-text-stroke: 1px rgba(191,26,26,0.5);
+    color: var(--cream);
+    text-shadow: 0 0 20px rgba(255,224,143,0.6), 2px 2px 0 rgba(191,26,26,0.5);
     flex-shrink: 0;
   }
 
@@ -806,7 +810,7 @@
 
   <div class="topbar">
     <div class="topbar-left">
-      REGULA_v2.0 / EST.2019 REACTIVATED_2025<br>
+      REGULA_v2.0 / EST.2019 REACTIVATED_2026<br>
       PSEUDONYM /// ANONYMOUS /// UNLABELLED
     </div>
     <div class="topbar-right">
@@ -945,7 +949,7 @@
             </ul>
           </div>
           <div class="meta-col">
-            <div class="meta-col-label">&gt; METAMORPH_2025—</div>
+            <div class="meta-col-label">&gt; METAMORPH_2026—</div>
             <ul class="meta-list">
               <li>Seseorang yang mengajar batu untuk berpikir — tapi ini bukan akun itu</li>
               <li>Geologi lebih dalam, lebih teknis, tetap organik</li>
@@ -1114,9 +1118,9 @@
   </div>
 </div>
 
-<!-- ── FOOTER ── */
+<!-- ── FOOTER ── -->
 <footer>
-  <div class="footer-left">REGULA ◈ 2025</div>
+  <div class="footer-left">REGULA ◈ 2026</div>
   <div class="footer-right">PSEUDONYM · ANONYMOUS · UNLABELLED</div>
 </footer>
 
@@ -1129,11 +1133,9 @@
     if (isOpen) {
       item.classList.remove('open');
       body.classList.remove('open');
-      body.style.maxHeight = '0';
     } else {
       item.classList.add('open');
       body.classList.add('open');
-      body.style.maxHeight = body.scrollHeight + 'px';
     }
   }
 </script>
