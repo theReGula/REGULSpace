@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REGULA</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=VT323&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:    #060771;
+    --navy2:   #080A8A;
+    --crimson: #BF1A1A;
+    --orange:  #FF6C0C;
+    --cream:   #FFE08F;
+    --cream2:  #FFF3C4;
+    --dark:    #03043D;
+    --muted:   #8B9EC4;
+    --faint:   #4A5580;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--navy);
+    color: var(--cream);
+    font-family: 'Space Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+    cursor: crosshair;
+    font-size: 18px;
+  }
+
+  /* Scanlines */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg, transparent, transparent 2px,
+      rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px
+    );
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* Vignette */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 60%, rgba(3,4,61,0.65) 100%);
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 3px solid var(--crimson);
+  }
+
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,224,143,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,224,143,0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+  }
+
+  .hero-perspective {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 45%;
+    background-image:
+      linear-gradient(rgba(191,26,26,0.15) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(191,26,26,0.1) 1px, transparent 1px);
+    background-size: 60px 30px;
+    transform: perspective(400px) rotateX(35deg);
+    transform-origin: bottom center;
+    pointer-events: none;
+    opacity: 0.7;
+  }
+
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1.5rem 3rem;
+    border-bottom: 1px solid rgba(255,224,143,0.12);
+    position: relative;
+    z-index: 2;
+  }
+
+  .topbar-left, .topbar-right {
+    font-family: 'VT323', monospace;
+    font-size: 1.1rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    line-height: 1.7;
+  }
+
+  .topbar-right { text-align: right; }
+
+  .hero-main {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    position: relative;
+    z-index: 2;
+    padding: 4rem 3rem;
+    gap: 4rem;
+    align-items: center;
+  }
+
+  .hero-left { position: relative; }
+
+  .pre-title {
+    font-family: 'VT323', monospace;
+    font-size: 1.3rem;
+    letter-spacing: 0.3em;
+    color: var(--orange);
+    margin-bottom: 0.5rem;
+    animation: fadeUp 0.5s ease 0.1s both;
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(100px, 15vw, 190px);
+    line-height: 0.85;
+    letter-spacing: 0.04em;
+    color: var(--cream);
+    position: relative;
+    animation: fadeUp 0.5s ease 0.2s both;
+  }
+
+  h1::before, h1::after {
+    content: 'REGULA';
+    position: absolute;
+    top: 0; left: 0;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: inherit;
+    line-height: inherit;
+    letter-spacing: inherit;
+  }
+
+  h1::before {
+    color: var(--crimson);
+    clip-path: polygon(0 30%, 100% 30%, 100% 45%, 0 45%);
+    transform: translateX(-3px);
+    animation: glitch1 4s infinite;
+  }
+
+  h1::after {
+    color: var(--orange);
+    clip-path: polygon(0 60%, 100% 60%, 100% 70%, 0 70%);
+    transform: translateX(3px);
+    animation: glitch2 4s infinite 0.5s;
+  }
+
+  .hero-year {
+    font-family: 'VT323', monospace;
+    font-size: clamp(70px, 9vw, 110px);
+    color: var(--crimson);
+    line-height: 0.9;
+    letter-spacing: 0.05em;
+    margin-top: 0.3rem;
+    display: block;
+    animation: fadeUp 0.5s ease 0.3s both;
+  }
+
+  .tagline {
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    font-size: clamp(1.15rem, 1.6vw, 1.5rem);
+    color: var(--muted);
+    margin-top: 1.8rem;
+    line-height: 1.8;
+    max-width: 420px;
+    animation: fadeUp 0.5s ease 0.4s both;
+  }
+
+  .tagline .t-orange { color: var(--orange); font-style: normal; }
+  .tagline .t-cream  { color: var(--cream2); font-style: normal; }
+
+  .warning-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 1.8rem;
+    background: rgba(191,26,26,0.12);
+    border: 1px solid rgba(191,26,26,0.4);
+    padding: 0.5rem 1.1rem;
+    font-family: 'VT323', monospace;
+    font-size: 1.1rem;
+    letter-spacing: 0.12em;
+    color: var(--crimson);
+    animation: fadeUp 0.5s ease 0.5s both;
+  }
+
+  .warning-badge::before { content: '!'; }
+
+  .hero-right { position: relative; }
+
+  .descriptor-item {
+    border-top: 1px solid rgba(255,224,143,0.1);
+    padding: 1.1rem 0;
+    display: grid;
+    grid-template-columns: 3rem 1fr;
+    gap: 0.75rem;
+    align-items: start;
+    opacity: 0;
+    transform: translateX(16px);
+    animation: slideIn 0.45s ease forwards;
+  }
+
+  .descriptor-item:nth-child(1) { animation-delay: 0.5s; }
+  .descriptor-item:nth-child(2) { animation-delay: 0.62s; }
+  .descriptor-item:nth-child(3) { animation-delay: 0.74s; }
+  .descriptor-item:nth-child(4) { animation-delay: 0.86s; }
+  .descriptor-item:last-child   { border-bottom: 1px solid rgba(255,224,143,0.1); }
+
+  .descriptor-num {
+    font-family: 'VT323', monospace;
+    font-size: 1.3rem;
+    color: var(--orange);
+    letter-spacing: 0.05em;
+    padding-top: 0.05rem;
+  }
+
+  .descriptor-text {
+    font-size: 0.85rem;
+    line-height: 1.75;
+    color: var(--muted);
+  }
+
+  .descriptor-text strong {
+    color: var(--cream);
+    font-weight: 700;
+    display: block;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 0.2rem;
+  }
+
+  .hero-bottom {
+    padding: 1.3rem 3rem;
+    border-top: 1px solid rgba(255,224,143,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid rgba(191,26,26,0.5);
+    background: rgba(191,26,26,0.08);
+    padding: 0.4rem 1rem;
+    font-family: 'VT323', monospace;
+    font-size: 1.1rem;
+    letter-spacing: 0.12em;
+    color: var(--crimson);
+  }
+
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--crimson);
+    animation: pulse 1.5s infinite;
+  }
+
+  .scroll-hint {
+    font-family: 'VT323', monospace;
+    font-size: 1.1rem;
+    letter-spacing: 0.2em;
+    color: var(--faint);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .scroll-hint::after { content: '▼'; animation: bounce 1.5s infinite; }
+
+  /* ── STRATA DIVIDER ── */
+  .strata-divider {
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(to right,
+      var(--dark), var(--crimson) 20%,
+      var(--orange) 50%, var(--cream) 80%, var(--dark)
+    );
+  }
+
+  /* ── ACCORDION ── */
+  .accordion-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .accordion-item {
+    border-bottom: 1px solid rgba(255,224,143,0.1);
+  }
+
+  .accordion-trigger {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem 3rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.2s;
+    gap: 1rem;
+  }
+
+  .accordion-trigger:hover {
+    background: rgba(255,224,143,0.03);
+  }
+
+  .accordion-trigger-left {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .accordion-index {
+    font-family: 'VT323', monospace;
+    font-size: 1.4rem;
+    color: var(--crimson);
+    letter-spacing: 0.1em;
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
+
+  .accordion-title {
+    font-family: 'VT323', monospace;
+    font-size: 1.8rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cream);
+    line-height: 1;
+  }
+
+  .accordion-arrow {
+    font-family: 'VT323', monospace;
+    font-size: 1.6rem;
+    color: var(--orange);
+    transition: transform 0.35s ease;
+    flex-shrink: 0;
+    letter-spacing: 0;
+  }
+
+  .accordion-item.open .accordion-arrow {
+    transform: rotate(90deg);
+  }
+
+  .accordion-item.open .accordion-trigger {
+    background: rgba(255,108,12,0.04);
+  }
+
+  .accordion-item.open .accordion-index {
+    color: var(--orange);
+    opacity: 1;
+  }
+
+  /* Accordion body */
+  .accordion-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .accordion-body.open {
+    max-height: 2000px;
+  }
+
+  .accordion-content {
+    padding: 0 3rem 3rem;
+  }
+
+  /* ── SECTION LABEL (inside accordion) ── */
+  .section-label {
+    font-family: 'VT323', monospace;
+    font-size: 1.1rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, rgba(255,108,12,0.5), transparent);
+  }
+
+  /* ── ORIGIN ── */
+  .origin-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 5rem;
+    align-items: start;
+  }
+
+  .origin-year-big {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(70px, 9vw, 120px);
+    line-height: 0.88;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(191,26,26,0.5);
+    flex-shrink: 0;
+  }
+
+  .origin-text {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.3rem;
+    line-height: 1.9;
+    color: rgba(255,224,143,0.8);
+  }
+
+  .origin-text p + p { margin-top: 1.1em; }
+  .origin-text .hl  { color: var(--orange); font-style: italic; }
+  .origin-text .hl2 { color: var(--cream); }
+  .origin-text .hl3 { color: var(--crimson); }
+
+  .origin-text .mystery {
+    display: block;
+    margin-top: 2rem;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--faint);
+    border-left: 3px solid var(--crimson);
+    padding-left: 1.2rem;
+    line-height: 1.7;
+  }
+
+  /* ── META ── */
+  .meta-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: rgba(255,224,143,0.08);
+  }
+
+  .meta-col {
+    padding: 2.5rem;
+    background: var(--navy);
+  }
+
+  .meta-col:first-child { background: rgba(3,4,61,0.8); }
+
+  .meta-col-label {
+    font-family: 'VT323', monospace;
+    font-size: 1.1rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--crimson);
+    margin-bottom: 1.5rem;
+    opacity: 0.75;
+  }
+
+  .meta-col:last-child .meta-col-label { color: var(--orange); opacity: 1; }
+
+  .meta-list { list-style: none; }
+
+  .meta-list li {
+    font-size: 0.85rem;
+    line-height: 2.1;
+    color: var(--muted);
+    padding-left: 1.3rem;
+    position: relative;
+  }
+
+  .meta-list li::before {
+    content: '►';
+    position: absolute;
+    left: 0;
+    font-size: 0.6rem;
+    color: var(--crimson);
+    opacity: 0.5;
+    top: 0.2em;
+  }
+
+  .meta-col:last-child .meta-list li { color: rgba(255,224,143,0.85); }
+  .meta-col:last-child .meta-list li::before { color: var(--orange); opacity: 0.8; }
+
+  .pt-path {
+    margin-top: 2rem;
+    padding: 1.1rem 1.3rem;
+    background: rgba(6,7,113,0.5);
+    border: 1px solid rgba(255,108,12,0.3);
+    font-family: 'VT323', monospace;
+    font-size: 1.1rem;
+    color: var(--orange);
+    line-height: 1.85;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── IDENTITY GRID ── */
+  .identity-core {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: rgba(255,224,143,0.08);
+  }
+
+  .identity-card {
+    background: var(--navy);
+    padding: 2rem;
+    transition: background 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .identity-card:hover { background: rgba(8,10,138,0.9); }
+
+  .identity-card::before {
+    content: '';
+    position: absolute;
+    top: 0.8rem; left: 0.8rem;
+    width: 1rem; height: 1rem;
+    border-top: 2px solid;
+    border-left: 2px solid;
+  }
+
+  .identity-card:nth-child(1)::before,
+  .identity-card:nth-child(5)::before { border-color: var(--crimson); }
+  .identity-card:nth-child(2)::before,
+  .identity-card:nth-child(4)::before { border-color: var(--cream); }
+  .identity-card:nth-child(3)::before,
+  .identity-card:nth-child(6)::before { border-color: var(--orange); }
+
+  .identity-card-title {
+    font-family: 'VT323', monospace;
+    font-size: 1.3rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--cream);
+    margin-bottom: 0.8rem;
+    margin-top: 0.8rem;
+  }
+
+  .identity-card-body {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.1rem;
+    line-height: 1.72;
+    color: var(--muted);
+  }
+
+  .identity-card-body em { color: var(--cream2); font-style: normal; }
+
+  .also-found {
+    background: rgba(3,4,61,0.7);
+    border: 1px solid rgba(255,224,143,0.1);
+    padding: 1.5rem 2rem;
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    margin-top: 1px;
+  }
+
+  .also-label {
+    font-family: 'VT323', monospace;
+    font-size: 1rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--faint);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .also-items { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+  .also-tag {
+    font-size: 0.75rem;
+    color: var(--muted);
+    border: 1px solid rgba(255,224,143,0.12);
+    padding: 0.3rem 0.7rem;
+    background: rgba(6,7,113,0.5);
+    transition: all 0.2s;
+  }
+
+  .also-tag:hover { color: var(--cream); border-color: var(--orange); }
+
+  /* ── FACES ── */
+  .faces-intro {
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    color: var(--muted);
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    max-width: 480px;
+    line-height: 1.8;
+  }
+
+  .faces-list { display: flex; flex-wrap: wrap; gap: 0.7rem; }
+
+  .face-chip {
+    font-family: 'VT323', monospace;
+    font-size: 1.2rem;
+    letter-spacing: 0.1em;
+    color: var(--cream);
+    border: 1px solid rgba(255,224,143,0.2);
+    padding: 0.35rem 1rem;
+    background: rgba(6,7,113,0.5);
+    transition: all 0.2s;
+  }
+
+  .face-chip:nth-child(3n+1):hover { border-color: var(--crimson); color: var(--crimson); }
+  .face-chip:nth-child(3n+2):hover { border-color: var(--orange);  color: var(--orange); }
+  .face-chip:nth-child(3n):hover   { border-color: var(--cream);   color: var(--cream2); }
+
+  /* ── DISCLAIMER ── */
+  .disclaimer-section {
+    background: var(--dark);
+    padding: 5rem 3rem;
+    position: relative;
+    overflow: hidden;
+    border-top: 3px solid var(--crimson);
+  }
+
+  .disclaimer-section::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(191,26,26,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(191,26,26,0.06) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+
+  .disclaimer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .disclaimer-top {
+    display: flex;
+    gap: 3.5rem;
+    align-items: flex-start;
+    margin-bottom: 3rem;
+  }
+
+  .disclaimer-symbol {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(70px, 10vw, 120px);
+    line-height: 0.9;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(191,26,26,0.5);
+    flex-shrink: 0;
+    animation: flicker 5s infinite;
+  }
+
+  .disclaimer-heading {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.2rem, 4.5vw, 4rem);
+    letter-spacing: 0.06em;
+    color: var(--cream);
+    line-height: 1.0;
+    margin-bottom: 1.3rem;
+  }
+
+  .disclaimer-heading .c-red    { color: var(--crimson); }
+  .disclaimer-heading .c-orange { color: var(--orange); }
+
+  .disclaimer-body {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.2rem;
+    line-height: 1.9;
+    color: var(--muted);
+    max-width: 560px;
+  }
+
+  .disclaimer-body em { color: var(--cream); font-style: normal; }
+
+  .disclaimer-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(191,26,26,0.2);
+  }
+
+  .dtag {
+    font-family: 'VT323', monospace;
+    font-size: 1.05rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.4rem 1rem;
+    border: 1px solid;
+  }
+
+  .dtag-red    { color: var(--crimson); border-color: rgba(191,26,26,0.45); background: rgba(191,26,26,0.08); }
+  .dtag-orange { color: var(--orange);  border-color: rgba(255,108,12,0.4);  background: rgba(255,108,12,0.07); }
+  .dtag-cream  { color: var(--cream);   border-color: rgba(255,224,143,0.3); background: rgba(255,224,143,0.06); }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--dark);
+    border-top: 1px solid rgba(191,26,26,0.2);
+    padding: 1.8rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-left {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem;
+    letter-spacing: 0.15em;
+    color: rgba(191,26,26,0.5);
+  }
+
+  .footer-right {
+    font-family: 'VT323', monospace;
+    font-size: 1rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideIn {
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 6px var(--crimson); }
+    50%       { opacity: 0.3; box-shadow: none; }
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(4px); }
+  }
+
+  @keyframes glitch1 {
+    0%, 90%, 100% { transform: translateX(-3px); opacity: 0.4; }
+    92% { transform: translateX(3px); opacity: 0.8; }
+    96% { transform: translateX(0); opacity: 0; }
+  }
+
+  @keyframes glitch2 {
+    0%, 88%, 100% { transform: translateX(3px); opacity: 0.3; }
+    90% { transform: translateX(-3px); opacity: 0.7; }
+    95% { transform: translateX(0); opacity: 0; }
+  }
+
+  @keyframes flicker {
+    0%, 95%, 100% { opacity: 1; }
+    96% { opacity: 0.4; }
+    98% { opacity: 0.2; }
+    99% { opacity: 1; }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .identity-core { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 768px) {
+    .hero-main { grid-template-columns: 1fr; gap: 2.5rem; }
+    .topbar, .hero-bottom { padding: 1.5rem; }
+    .accordion-trigger { padding: 1.5rem; }
+    .accordion-content { padding: 0 1.5rem 2.5rem; }
+    .origin-grid { grid-template-columns: 1fr; gap: 1.8rem; }
+    .meta-columns { grid-template-columns: 1fr; }
+    .identity-core { grid-template-columns: 1fr; }
+    .also-found { flex-direction: column; gap: 1rem; }
+    .disclaimer-section { padding: 3.5rem 1.5rem; }
+    .disclaimer-top { flex-direction: column; gap: 1.5rem; }
+    footer { padding: 1.5rem; flex-direction: column; gap: 0.8rem; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HERO ── -->
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-perspective"></div>
+
+  <div class="topbar">
+    <div class="topbar-left">
+      REGULA_v2.0 / EST.2019 REACTIVATED_2025<br>
+      PSEUDONYM /// ANONYMOUS /// UNLABELLED
+    </div>
+    <div class="topbar-right">
+      LANG: ID + EN /// CONTENT: RANDOM<br>
+      YOU HAVE BEEN WARNED
+    </div>
+  </div>
+
+  <div class="hero-main">
+    <div class="hero-left">
+      <div class="pre-title">[ FIELD_LOG · ACTIVE ]</div>
+      <h1>REGULA</h1>
+      <span class="hero-year">2019 →</span>
+      <p class="tagline">
+        Chaos agent. <span class="t-orange">Berilmu</span> by nature.<br>
+        Nyentrik by design.<br>
+        Sama batunya —<br>
+        <span class="t-cream">satu siklus metamorfosis lebih jauh.</span>
+      </p>
+      <div class="warning-badge">
+        TWEETS VERY RANDOM · PAY ATTENTION
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="descriptor-item">
+        <span class="descriptor-num">01_</span>
+        <div class="descriptor-text">
+          <strong>Origin</strong>
+          Lahir dari tekanan dan jarak. Chaos bukan kecelakaan — itu kondisi awal.
+        </div>
+      </div>
+      <div class="descriptor-item">
+        <span class="descriptor-num">02_</span>
+        <div class="descriptor-text">
+          <strong>Substrate</strong>
+          Geoscientist. Bukan dekorasi — itu cara berpikir. Semuanya jadi batuan kalau dipikir cukup lama.
+        </div>
+      </div>
+      <div class="descriptor-item">
+        <span class="descriptor-num">03_</span>
+        <div class="descriptor-text">
+          <strong>Unlabelled</strong>
+          Tidak ada label. Tidak ada kategori. Apa gunanya? Useless.
+        </div>
+      </div>
+      <div class="descriptor-item">
+        <span class="descriptor-num">04_</span>
+        <div class="descriptor-text">
+          <strong>What's here</strong>
+          Ilmu yang jujur. Rant berkedok bahasa formal. Foto. Puisi. Sambat. Tarot. Kopi.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-bottom">
+    <div class="status-pill">
+      <div class="status-dot"></div>
+      SYS: REACTIVATED · UPGRADED
+    </div>
+    <div class="scroll-hint">SCROLL</div>
+  </div>
+</div>
+
+<div class="strata-divider"></div>
+
+<!-- ── ACCORDION SECTIONS ── -->
+<div class="accordion-wrapper">
+
+  <!-- 01 ORIGIN -->
+  <div class="accordion-item" id="acc-origin">
+    <button class="accordion-trigger" onclick="toggleAccordion('acc-origin')">
+      <div class="accordion-trigger-left">
+        <span class="accordion-index">01_</span>
+        <span class="accordion-title">// ORIGIN_STORY</span>
+      </div>
+      <span class="accordion-arrow">►</span>
+    </button>
+    <div class="accordion-body" id="body-acc-origin">
+      <div class="accordion-content">
+        <div class="origin-grid">
+          <div class="origin-year-big">2019<br>→<br>NOW</div>
+          <div class="origin-text">
+            <p>
+              REGULA tidak lahir dari rencana.
+              Dia lahir dari <span class="hl">dinginnya musim yang tidak familiar</span>
+              — dari jarak ribuan kilometer, dari hari-hari yang terlalu padat
+              untuk diceritakan dengan cara yang biasa.
+            </p>
+            <p>
+              Di suatu tempat di <span class="hl2">ujung timur Asia</span>,
+              di negeri empat musim yang tidak pernah benar-benar terasa seperti rumah,
+              seseorang mulai menulis. Tanpa audience. Tanpa agenda.
+              Hanya supaya ada yang tercatat.
+            </p>
+            <p>
+              Banyak yang berubah sejak saat itu.
+              Konteks berbeda. Tekanan berbeda. Kedalamannya juga berbeda.
+              Tapi cara kerja kepalanya —
+              <span class="hl3">tidak.</span>
+            </p>
+            <em class="mystery">
+              siapa REGULA waktu itu?<br>
+              itu pertanyaan yang jawabannya lebih menarik kalau kamu cari sendiri.
+            </em>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="strata-divider"></div>
+
+  <!-- 02 METAMORPHIC -->
+  <div class="accordion-item" id="acc-meta">
+    <button class="accordion-trigger" onclick="toggleAccordion('acc-meta')">
+      <div class="accordion-trigger-left">
+        <span class="accordion-index">02_</span>
+        <span class="accordion-title">// METAMORPHIC_RECORD</span>
+      </div>
+      <span class="accordion-arrow">►</span>
+    </button>
+    <div class="accordion-body" id="body-acc-meta">
+      <div class="accordion-content">
+        <div class="meta-columns">
+          <div class="meta-col">
+            <div class="meta-col-label">&gt; PROTOLITH_2019-2021</div>
+            <ul class="meta-list">
+              <li>Jauh dari rumah. Tekanan tinggi. Dingin.</li>
+              <li>Geologi as casual knowledge drop</li>
+              <li>Chaos eksplosif, belum terkonsolidasi</li>
+              <li>Jokes karena survive</li>
+              <li>Foto karena mata tidak bisa diam</li>
+              <li>Puisi karena ada yang tidak bisa digeologikan</li>
+            </ul>
+          </div>
+          <div class="meta-col">
+            <div class="meta-col-label">&gt; METAMORPH_2025—</div>
+            <ul class="meta-list">
+              <li>Seseorang yang mengajar batu untuk berpikir — tapi ini bukan akun itu</li>
+              <li>Geologi lebih dalam, lebih teknis, tetap organik</li>
+              <li>Chaos yang sudah punya foliation</li>
+              <li>Jokes karena memang begini orangnya</li>
+              <li>Foto masih ada. Mata masih tidak bisa diam.</li>
+              <li>Puisi juga masih ada. Medium is the address.</li>
+            </ul>
+            <div class="pt-path">
+              SAME ROCK · HIGHER P · HIGHER T<br>
+              FABRIC: FOLIATED, NOT FRACTURED<br>
+              GRADE: UPPER AMPHIBOLITE<br>
+              STATUS: REACTIVATED ◈
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="strata-divider"></div>
+
+  <!-- 03 WHAT YOU'LL FIND -->
+  <div class="accordion-item" id="acc-find">
+    <button class="accordion-trigger" onclick="toggleAccordion('acc-find')">
+      <div class="accordion-trigger-left">
+        <span class="accordion-index">03_</span>
+        <span class="accordion-title">// WHAT_YOU'LL_FIND</span>
+      </div>
+      <span class="accordion-arrow">►</span>
+    </button>
+    <div class="accordion-body" id="body-acc-find">
+      <div class="accordion-content">
+        <div class="identity-core">
+          <div class="identity-card">
+            <div class="identity-card-title">📷 Photography</div>
+            <div class="identity-card-body">
+              Foto hadir <em>hampir setiap hari</em>. Landscape, detail, texture.
+              Mata geologist tidak bisa melihat dunia tanpa membaca strukturnya.
+            </div>
+          </div>
+          <div class="identity-card">
+            <div class="identity-card-title">✦ Tarot &amp; Divination</div>
+            <div class="identity-card-body">
+              Bukan ramalan. Bukan takhayul.
+              Sistem simbolik yang <em>berbicara ke lapisan lain</em> dari berpikir.
+              Coexists dengan geosains. Tidak perlu pilih satu.
+            </div>
+          </div>
+          <div class="identity-card">
+            <div class="identity-card-title">◈ Rant / Sambat</div>
+            <div class="identity-card-body">
+              Hampir tiap hari ada sambat soal work life —
+              tapi dalam <em>bahasa yang sudah di-disguise.</em>
+              Kalau kamu cukup jeli, kamu akan tahu.
+            </div>
+          </div>
+          <div class="identity-card">
+            <div class="identity-card-title">✍ Poetry</div>
+            <div class="identity-card-body">
+              Ada puisi. Di sini, di Medium.
+              Cara lain membaca hal-hal yang
+              <em>tidak bisa diekspresikan lewat data.</em>
+            </div>
+          </div>
+          <div class="identity-card">
+            <div class="identity-card-title">◐ Bilingual Chaos</div>
+            <div class="identity-card-body">
+              Bahasa Indonesia dan English.
+              Kadang dalam satu tweet. Kadang <em>dalam satu kalimat.</em>
+              Tidak ada pattern. Itu memang disengaja.
+            </div>
+          </div>
+          <div class="identity-card">
+            <div class="identity-card-title">⬡ Geoscience (always)</div>
+            <div class="identity-card-body">
+              Tidak diumumkan. Tidak dipaksakan.
+              Tapi selalu ada — <em>hadir organik</em> di antara hal-hal lain.
+              Karena itu memang cara kerja kepalanya.
+            </div>
+          </div>
+        </div>
+        <div class="also-found">
+          <div class="also-label">ALSO_FOUND ↘</div>
+          <div class="also-items">
+            <span class="also-tag">☕ home brewing · V60 &amp; espresso</span>
+            <span class="also-tag">📚 books &amp; papers (slow reader)</span>
+            <span class="also-tag">🎵 retro → hip-hop → metal</span>
+            <span class="also-tag">slow mornings</span>
+            <span class="also-tag">intrusive thoughts</span>
+            <span class="also-tag">field notes</span>
+            <span class="also-tag">half-finished journals</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="strata-divider"></div>
+
+  <!-- 04 CERTIFIED FAN OF -->
+  <div class="accordion-item" id="acc-fans">
+    <button class="accordion-trigger" onclick="toggleAccordion('acc-fans')">
+      <div class="accordion-trigger-left">
+        <span class="accordion-index">04_</span>
+        <span class="accordion-title">// CERTIFIED_FAN_OF</span>
+      </div>
+      <span class="accordion-arrow">►</span>
+    </button>
+    <div class="accordion-body" id="body-acc-fans">
+      <div class="accordion-content">
+        <p class="faces-intro">
+          Taste-ku adalah: orang-orang yang punya intensity.<br>
+          Aktor, penyanyi — semuanya masuk kalau mereka
+          bawa sesuatu yang tidak bisa diabaikan.
+        </p>
+        <div class="faces-list">
+          <span class="face-chip">Cillian Murphy</span>
+          <span class="face-chip">Mads Mikkelsen</span>
+          <span class="face-chip">Lee Jaewook</span>
+          <span class="face-chip">Lee Soohyuk</span>
+          <span class="face-chip">Lee Dongwook</span>
+          <span class="face-chip">Jung Krystal</span>
+          <span class="face-chip">Go Younjung</span>
+          <span class="face-chip">Nicholas Saputra</span>
+          <span class="face-chip">DPR IAN</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end accordion-wrapper -->
+
+<div class="strata-divider"></div>
+
+<!-- ── DISCLAIMER ── -->
+<div class="disclaimer-section">
+  <div class="disclaimer-inner">
+    <div class="disclaimer-top">
+      <div class="disclaimer-symbol">§</div>
+      <div>
+        <div class="disclaimer-heading">
+          Think <span class="c-orange">twice</span><br>
+          before you <span class="c-red">follow.</span>
+        </div>
+        <div class="disclaimer-body">
+          Ini bukan akun yang aman untuk semua orang.
+          Kontennya random, opininya tidak selalu nyaman,
+          dan REGULA tidak akan menyesuaikan diri
+          dengan ekspektasimu.<br><br>
+          Kalau kamu butuh akun yang konsisten, rapi, dan predictable —
+          <em>ini bukan tempat itu.</em><br><br>
+          Tapi kalau kamu bisa handle chaos yang berilmu,
+          dan tidak takut bertemu pikiran yang belum selesai —
+          welcome. Pintu terbuka. Tapi kamu yang pilih masuk.
+        </div>
+      </div>
+    </div>
+    <div class="disclaimer-tags">
+      <span class="dtag dtag-red">⛔ MDNI — MINORS DO NOT INTERACT</span>
+      <span class="dtag dtag-orange">⚠ FOLLOW AT YOUR OWN RISK</span>
+      <span class="dtag dtag-orange">⚠ OPINIONS MAY BE UNCOMFORTABLE</span>
+      <span class="dtag dtag-cream">✓ UNLABELLED ACCOUNT</span>
+      <span class="dtag dtag-cream">✓ PSEUDONYM · ANONYMOUS · REAL OPINIONS</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── FOOTER ── */
+<footer>
+  <div class="footer-left">REGULA ◈ 2025</div>
+  <div class="footer-right">PSEUDONYM · ANONYMOUS · UNLABELLED</div>
+</footer>
+
+<script>
+  function toggleAccordion(id) {
+    const item = document.getElementById(id);
+    const body = document.getElementById('body-' + id);
+    const isOpen = item.classList.contains('open');
+
+    if (isOpen) {
+      item.classList.remove('open');
+      body.classList.remove('open');
+      body.style.maxHeight = '0';
+    } else {
+      item.classList.add('open');
+      body.classList.add('open');
+      body.style.maxHeight = body.scrollHeight + 'px';
+    }
+  }
+</script>
+
+</body>
+</html>
